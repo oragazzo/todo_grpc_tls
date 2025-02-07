@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+option go_package = "github.com/irfan-arrosid/grpc-todo-app/proto";
+
+package todo;
+
+service TodoService {
+    rpc CreateTodo (CreateTodoRequest) returns (CreateTodoResponse);
+    rpc GetTodos (GetTodosRequest) returns (GetTodosResponse);
+    rpc UpdateTodo (UpdateTodoRequest) returns (UpdateTodoResponse);
+    rpc DeleteTodo (DeleteTodoRequest) returns (DeleteTodoResponse);
+}
+
+message CreateTodoRequest {
+    string title = 1;
+    bool completed = 2;
+}
+
+message CreateTodoResponse {
+    int64 id = 1;
+    string title = 2;
+    bool completed = 3;
+}
+
+message GetTodosRequest {}
+
+message GetTodosResponse {
+    repeated Todo todo_list = 1;
+
+    message Todo {
+        int64 id = 1;
+        string title = 2;
+        bool completed = 3;
+    }
+}
+
+message UpdateTodoRequest {
+    int64 id = 1;
+    string title = 2;
+    bool completed = 3;
+}
+
+message UpdateTodoResponse {
+    int64 id = 1;
+    string title = 2;
+    bool completed = 3;
+}
+
+message DeleteTodoRequest {
+    int64 id = 1;
+}
+
+message DeleteTodoResponse {}
+
+// export PATH="$PATH:$(go env GOPATH)/bin"
+
+// protoc --go_out=paths=source_relative:. --go-grpc_out=paths=source_relative:. proto/todo.proto
