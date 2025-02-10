@@ -1,4 +1,4 @@
-module github.com/oragazzo/todo_grpc
+module github.com/oragazzo/todo_grpc_tls
 
 go 1.23.5
 

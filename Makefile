@@ -5,8 +5,8 @@ gen_certs:
 	bash ./cert/gen.sh
 
 run_server:
-	go run server/main.go -port 8080 -cert_file ./cert/server-cert.pem -key_file ./cert/server-key.pem -ca_file ./cert/ca-cert.pem
+	go run cmd/server/main.go
 
 run_client:
-	go run client/main.go -address 127.0.0.1:8080 -cert_file ./cert/server-cert.pem
+	go run cmd/client/main.go
 
