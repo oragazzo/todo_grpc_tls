@@ -1,10 +1,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net"
 	"os"
+	"path/filepath"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -16,9 +18,31 @@ import (
 	pb "github.com/oragazzo/todo_grpc_tls/proto"
 )
 
+func loadEnvFile(envPath string) error {
+	if envPath != "" {
+		// If absolute path is provided, use it directly
+		if filepath.IsAbs(envPath) {
+			return godotenv.Load(envPath)
+		}
+		// Convert relative path to absolute
+		absPath, err := filepath.Abs(envPath)
+		if err != nil {
+			return fmt.Errorf("failed to resolve path: %v", err)
+		}
+		return godotenv.Load(absPath)
+	}
+
+	// Default behavior: try to load .env from the current directory
+	return godotenv.Load()
+}
+
 func main() {
+	// Parse command line flags
+	envPath := flag.String("env-path", "", "Path to the environment file")
+	flag.Parse()
+
 	// Load environment variables
-	if err := godotenv.Load(); err != nil {
+	if err := loadEnvFile(*envPath); err != nil {
 		log.Printf("Warning: Error loading .env file: %v", err)
 	}
 

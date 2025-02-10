@@ -12,6 +12,7 @@ This project showcases how to implement secure communication between a gRPC clie
 - Client-Server architecture
 - Certificate-based authentication
 - Todo service implementation
+- Environment-based configuration
 - Makefile for easy project management
 
 ## Prerequisites
@@ -19,6 +20,7 @@ This project showcases how to implement secure communication between a gRPC clie
 - Go 1.23.5 or higher
 - Protocol Buffers compiler
 - Make
+- PostgreSQL database
 
 ## Project Structure
 
@@ -27,10 +29,77 @@ This project showcases how to implement secure communication between a gRPC clie
 ├── cert/               # Directory containing TLS certificates and generation scripts
 ├── cmd/                # Application entry points
 │   ├── client/        # gRPC client implementation
+│   │   ├── .env      # Client environment configuration
+│   │   └── main.go   # Client entry point
 │   └── server/        # gRPC server implementation
-├── proto/              # Protocol Buffers definitions
-├── Makefile           # Build and run commands
-└── README.md          # This file
+│       ├── .env      # Server environment configuration
+│       └── main.go   # Server entry point
+├── internal/          # Internal packages
+├── proto/             # Protocol Buffers definitions
+├── Makefile          # Build and run commands
+└── README.md         # This file
+```
+
+## Environment Configuration
+
+Both the server and client use environment variables for configuration. You can provide these variables in two ways:
+
+1. Using `.env` files
+2. Setting environment variables directly
+
+### Server Configuration
+
+Create a `cmd/server/.env` file with the following variables:
+
+```env
+# Database Configuration
+DSN="host=localhost user=postgres password=postgres dbname=todos port=5432 sslmode=disable"
+
+# Server TLS Configuration
+TLS_CERT_FILE=/path/to/server.crt
+TLS_KEY_FILE=/path/to/server.key
+TLS_CA_FILE=/path/to/ca.crt
+TLS_SERVER_NAME=localhost
+
+# gRPC Server Configuration
+PORT=8080
+```
+
+### Client Configuration
+
+Create a `cmd/client/.env` file with:
+
+```env
+# Client TLS Configuration
+TLS_CERT_FILE=/path/to/client.crt
+TLS_KEY_FILE=/path/to/client.key
+TLS_CA_FILE=/path/to/ca.crt
+TLS_SERVER_NAME=localhost
+
+# gRPC Client Configuration
+SERVER_ADDRESS=localhost:8080
+```
+
+### Environment File Location
+
+You can specify a custom location for the `.env` file using the `--env-path` flag:
+
+```bash
+# Run server with custom env file
+go run cmd/server/main.go --env-path=/path/to/server.env
+
+# Run client with custom env file
+go run cmd/client/main.go --env-path=/path/to/client.env
+```
+
+The Makefile includes commands that automatically use the correct env files:
+
+```bash
+# Run server with default env file
+make run_server
+
+# Run client with default env file
+make run_client
 ```
 
 ## Getting Started
@@ -45,12 +114,16 @@ make gen_proto
 make gen_certs
 ```
 
-3. Run the server:
+3. Set up environment files:
+   - Copy `cmd/server/.env.example` to `cmd/server/.env` and adjust values
+   - Copy `cmd/client/.env.example` to `cmd/client/.env` and adjust values
+
+4. Run the server:
 ```bash
 make run_server
 ```
 
-4. In a new terminal, run the client:
+5. In a new terminal, run the client:
 ```bash
 make run_client
 ```
@@ -62,7 +135,6 @@ The project implements TLS security using X.509 certificates. Here's how the sec
 1. **Certificate Generation**: A script in the `cert/` directory generates:
    - A Certificate Authority (CA)
    - Server certificates signed by the CA
-   - Client certificates (when needed)
 
 2. **Server Security**: 
    - The server is configured with its certificate and private key
@@ -72,7 +144,7 @@ The project implements TLS security using X.509 certificates. Here's how the sec
 3. **Client Security**:
    - The client verifies the server's certificate
    - It uses the CA certificate to establish trust
-   - (Optional) Client certificates for mutual TLS authentication
+   - Client certificates for mutual TLS authentication
 
 ## Understanding TLS in gRPC
 

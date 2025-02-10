@@ -5,8 +5,8 @@ gen_certs:
 	bash ./cert/gen.sh
 
 run_server:
-	go run cmd/server/main.go
+	go run cmd/server/main.go -env-path=cmd/server/.env
 
 run_client:
-	go run cmd/client/main.go
+	go run cmd/client/main.go -env-path=cmd/client/.env
 
