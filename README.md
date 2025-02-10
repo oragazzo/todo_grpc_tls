@@ -22,6 +22,14 @@ This project showcases how to implement secure communication between a gRPC clie
 - Make
 - PostgreSQL database
 
+### Database Setup
+
+Before running the application, create a PostgreSQL database named "todos":
+
+```sql
+CREATE DATABASE todos;
+```
+
 ## Project Structure
 
 ```
