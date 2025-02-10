@@ -2,13 +2,15 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"log"
+	"os"
 
+	pb "github.com/oragazzo/todo_grpc_tls/proto"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
-	pb "github.com/oragazzo/todo_grpc/proto"
+	"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -71,9 +73,18 @@ func DeleteTodo(client pb.TodoServiceClient) {
 	fmt.Println(resDeleteTodo)
 }
 
+var (
+	caCert     = "cert/ca.crt"
+	clientCert = "cert/client.crt"
+	clientKey  = "cert/client.key"
+)
+
 func main() {
-	// Set up a connection to the server
-	conn, err := grpc.Dial("localhost"+port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// Load client's certificates and create credentials
+	tlsConfig := loadTLSConfig()
+	creds := credentials.NewTLS(tlsConfig)
+
+	conn, err := grpc.NewClient("localhost"+port, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalln("Error in dial", err.Error())
 	}
@@ -86,4 +97,30 @@ func main() {
 	// GetTodos(client)
 	// UpdateTodo(client)
 	// DeleteTodo(client)
+}
+
+func loadTLSConfig() *tls.Config {
+	// Load certificate of the CA who signed server's certificate
+	caCert, err := os.ReadFile(caCert)
+	if err != nil {
+		log.Fatalf("Failed to load CA certificate: %v", err)
+	}
+
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(caCert) {
+		log.Fatal("Failed to append CA certificate to pool")
+	}
+
+	// Load client's certificate and private key
+	clientCert, err := tls.LoadX509KeyPair(clientCert, clientKey)
+	if err != nil {
+		log.Fatalf("Failed to load client certificate and key: %v", err)
+	}
+
+	// Create and return the TLS configuration
+	return &tls.Config{
+		RootCAs:      certPool,
+		Certificates: []tls.Certificate{clientCert},
+		ServerName:   "localhost",
+	}
 }

@@ -51,7 +51,3 @@ message DeleteTodoRequest {
 }
 
 message DeleteTodoResponse {}
-
-// export PATH="$PATH:$(go env GOPATH)/bin"
-
-// protoc --go_out=paths=source_relative:. --go-grpc_out=paths=source_relative:. proto/todo.proto
