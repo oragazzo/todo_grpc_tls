@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-option go_package = "github.com/irfan-arrosid/grpc-todo-app/proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/oragazzo/todo_grpc_tls/proto";
 
 package todo;
 
@@ -14,12 +16,14 @@ service TodoService {
 message CreateTodoRequest {
     string title = 1;
     bool completed = 2;
+    google.protobuf.Timestamp created_at = 3;
 }
 
 message CreateTodoResponse {
     int64 id = 1;
     string title = 2;
     bool completed = 3;
+    google.protobuf.Timestamp created_at = 4;
 }
 
 message GetTodosRequest {}
@@ -31,6 +35,8 @@ message GetTodosResponse {
         int64 id = 1;
         string title = 2;
         bool completed = 3;
+        google.protobuf.Timestamp created_at = 4;
+        google.protobuf.Timestamp updated_at = 5;
     }
 }
 
@@ -38,12 +44,14 @@ message UpdateTodoRequest {
     int64 id = 1;
     string title = 2;
     bool completed = 3;
+    google.protobuf.Timestamp updated_at = 4;
 }
 
 message UpdateTodoResponse {
     int64 id = 1;
     string title = 2;
     bool completed = 3;
+    google.protobuf.Timestamp updated_at = 4;
 }
 
 message DeleteTodoRequest {

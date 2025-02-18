@@ -3,7 +3,9 @@ package server
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 
 	"github.com/oragazzo/todo_grpc_tls/internal/models"
@@ -24,9 +26,12 @@ func NewTodoServer(db *gorm.DB) *TodoServer {
 }
 
 func (s *TodoServer) CreateTodo(ctx context.Context, req *pb.CreateTodoRequest) (*pb.CreateTodoResponse, error) {
+	now := time.Now()
 	todo := &models.Todo{
 		Title:     req.Title,
 		Completed: req.Completed,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
 	if err := s.db.Create(todo).Error; err != nil {
@@ -37,6 +42,7 @@ func (s *TodoServer) CreateTodo(ctx context.Context, req *pb.CreateTodoRequest) 
 		Id:        int64(todo.ID),
 		Title:     todo.Title,
 		Completed: todo.Completed,
+		CreatedAt: timestamppb.New(todo.CreatedAt),
 	}, nil
 }
 
@@ -53,6 +59,8 @@ func (s *TodoServer) GetTodos(ctx context.Context, req *pb.GetTodosRequest) (*pb
 			Id:        int64(todo.ID),
 			Title:     todo.Title,
 			Completed: todo.Completed,
+			CreatedAt: timestamppb.New(todo.CreatedAt),
+			UpdatedAt: timestamppb.New(todo.UpdatedAt),
 		})
 	}
 
@@ -79,6 +87,7 @@ func (s *TodoServer) UpdateTodo(ctx context.Context, req *pb.UpdateTodoRequest) 
 		Id:        int64(todo.ID),
 		Title:     todo.Title,
 		Completed: todo.Completed,
+		UpdatedAt: timestamppb.New(todo.UpdatedAt),
 	}, nil
 }
 

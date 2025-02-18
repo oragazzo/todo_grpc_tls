@@ -27,7 +27,7 @@ func CreateTodo(client pb.TodoServiceClient) {
 		log.Fatal("Error to create todo", err.Error())
 	}
 
-	fmt.Printf("Created Todo: ID=%d, Title=%s, Completed=%t\n", resCreateTodo.Id, resCreateTodo.Title, resCreateTodo.Completed)
+	fmt.Printf("Created Todo: ID=%d, Title=%s, Completed=%t, CreatedAt=%s\n", resCreateTodo.Id, resCreateTodo.Title, resCreateTodo.Completed, resCreateTodo.CreatedAt.AsTime())
 }
 
 func GetTodos(client pb.TodoServiceClient) {
@@ -39,7 +39,7 @@ func GetTodos(client pb.TodoServiceClient) {
 	}
 
 	for _, todo := range resGetTodos.TodoList {
-		fmt.Printf("Todo: ID=%d, Title=%s, Completed=%t\n", todo.Id, todo.Title, todo.Completed)
+		fmt.Printf("Todo: ID=%d, Title=%s, Completed=%t, CreatedAt=%s, UpdatedAt=%s\n", todo.Id, todo.Title, todo.Completed, todo.CreatedAt.AsTime(), todo.UpdatedAt.AsTime())
 	}
 }
 
@@ -55,7 +55,7 @@ func UpdateTodo(client pb.TodoServiceClient) {
 		log.Fatal("Error to update todo", err.Error())
 	}
 
-	fmt.Printf("Updated Todo: ID=%d, Title=%s, Completed=%t\n", resUpdateTodo.Id, resUpdateTodo.Title, resUpdateTodo.Completed)
+	fmt.Printf("Updated Todo: ID=%d, Title=%s, Completed=%t, UpdatedAt=%s\n", resUpdateTodo.Id, resUpdateTodo.Title, resUpdateTodo.Completed, resUpdateTodo.UpdatedAt.AsTime())
 }
 
 func DeleteTodo(client pb.TodoServiceClient) {
@@ -125,8 +125,8 @@ func main() {
 	// Create a new TodoService client
 	client := pb.NewTodoServiceClient(conn)
 
-	CreateTodo(client)
-	// GetTodos(client)
+	// CreateTodo(client)
+	GetTodos(client)
 	// UpdateTodo(client)
 	// DeleteTodo(client)
 }
